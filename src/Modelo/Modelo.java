@@ -30,8 +30,12 @@ public class Modelo{
     
     public static void cargarDatos(String tipoDato, String mes, String anio){
         if(!"".equals(tipoDato) && !"Mes".equals(mes) && !"Año".equals(anio)){
+            if("Velocidad".equals(tipoDato)){
+                List<VelocidadDTO> velocidades = leerVelocidades(tipoDato,mes,anio);
+            }if("Volumen".equals(tipoDato)){
+                List<VolumenDTO> volumenes = leerVolumenes(tipoDato,mes,anio);
+            }
             System.out.println(tipoDato + " " + mes + " " + anio);
-            List<VelocidadDTO> velocidades = leerVelocidades(tipoDato,mes,anio);
         }else
             JOptionPane.showMessageDialog(new JFrame(), "Por favor ingrese los datos solicitados");
     }
@@ -383,6 +387,128 @@ public class Modelo{
         }
         System.out.println("Done!");
         return velocidadesDTO;
+    }
+    
+    static List<VolumenDTO> leerVolumenes(String tipoDato, String mes, String anio){
+        List<VolumenDTO> volumenesDTO = new ArrayList<>();
+        try{
+            System.out.println("leerVolumenes");
+            String ruta = hacerRuta(tipoDato, mes, anio);
+            
+            File folder = new File(ruta);
+            File[] listOfFiles = folder.listFiles();
+            
+            for(File file: listOfFiles){
+                if(!file.getName().startsWith("~")){
+                    System.out.println(ruta + WIN_APPENDER + file.getName() + "--------------------------------------------------------------");
+                    VolumenDTO vol = new VolumenDTO();
+                    FileInputStream stream = new FileInputStream(new File(ruta + WIN_APPENDER + file.getName()));
+                    XSSFWorkbook workbook = new XSSFWorkbook(stream);
+                    XSSFSheet worksheet = workbook.getSheet("1.IDENTIFICACION");
+                    
+                    //Lectura Longitud y Latitud
+                    Row longitud = worksheet.getRow(12);
+                    Cell longitu = longitud.getCell(23);
+                    vol.setLon(longitu.getStringCellValue());
+                    System.out.println("Longitud: " + vol.getLon());
+                    
+                    Row latitud = worksheet.getRow(13);
+                    Cell latitu = latitud.getCell(23);
+                    vol.setLat(latitu.getStringCellValue());
+                    System.out.println("Latitud: " + vol.getLat());
+                    
+                    //Lectura nombreArchivo
+                    Row nombre = worksheet.getRow(9);
+                    Cell nom = nombre.getCell(21);
+                    vol.setNombreArchivo(nom.getStringCellValue());
+                    System.out.println("Nombre del Archivo:" + vol.getNombreArchivo());
+                    
+                    //Lectura interseccion
+                    Row interseccion = worksheet.getRow(9);
+                    Cell inter = interseccion.getCell(21);
+                    vol.setInterseccion(inter.getStringCellValue());
+                    System.out.println("Intersección: " + vol.getInterseccion());
+                    
+                    //Lectura fechaEstudio
+                    Row fecha = worksheet.getRow(27);
+                    Cell fec = fecha.getCell(18);
+                    vol.setFechaEstudio(fec.getStringCellValue());
+                    System.out.println("Fecha: " + vol.getFechaEstudio());
+                    
+                    //Lectura analisisPuntual
+                    Row analisis = worksheet.getRow(58);
+                    Cell ana = analisis.getCell(16);
+                    vol.setAnalisisPuntual(ana.getStringCellValue());
+                    System.out.println("Analisis: " + vol.getAnalisisPuntual());
+                    
+                    //Lectura numPeriodos
+                    List<String> numPeriodos = new ArrayList<>();
+                    for(int i = 34; i < 37; i++){
+                        Row periodos = worksheet.getRow(i);
+                        Cell per = periodos.getCell(23);
+                        if(!per.getStringCellValue().isEmpty() || !per.getStringCellValue().equals("")){
+                            numPeriodos.add(per.getStringCellValue());
+                        }
+                    }
+                    vol.setNumPeriodos(numPeriodos);
+                    
+                    for(int i = 0; i<vol.getNumPeriodos().size(); i++){
+                        System.out.println("Periodo " + i + ": " + vol.getNumPeriodos().get(i));
+                    }
+                    
+                    //Lectura numHoras
+                    Row horas = worksheet.getRow(37);
+                    Cell hor = horas.getCell(24);
+                    vol.setNumHoras(String.valueOf(hor.getNumericCellValue()));
+                    System.out.println("Número de horas: " + vol.getNumHoras());
+                    
+                    //Lectura horario
+                    Row horario = worksheet.getRow(38);
+                    Cell hora = horario.getCell(24);
+                    vol.setHorario(hora.getStringCellValue());
+                    System.out.println("Horario: " + vol.getHorario());
+                    
+                    //Lectura numEquipos
+                    Row equipos = worksheet.getRow(39);
+                    Cell equi = equipos.getCell(24);
+                    vol.setNumEquipos(String.valueOf(equi.getNumericCellValue()));
+                    System.out.println("Numero de equipos: " + vol.getNumEquipos());
+                    
+                    //Lectura resumen mensual
+                    XSSFSheet worksheet1 = workbook.getSheet("5a.RESUMEN MENSUAL");
+                    
+                    Row livianos = worksheet1.getRow(7);
+                    Cell livi = livianos.getCell(9);
+                    vol.setVolLivianos((int)livi.getNumericCellValue());
+                    System.out.println("Volumen vehículos livianos: " + vol.getVolLivianos());
+                    
+                    Row vtpc = worksheet1.getRow(7);
+                    Cell tpc = vtpc.getCell(10);
+                    vol.setVolTPC((int)tpc.getNumericCellValue());
+                    System.out.println("Volumen Transporte público colectivo: " + vol.getVolTPC());
+                    
+                    Row camiones = worksheet1.getRow(7);
+                    Cell camion = camiones.getCell(11);
+                    vol.setVolCamiones((int)camion.getNumericCellValue());
+                    System.out.println("Volumen camiones: " + vol.getVolCamiones());
+                    
+                    Row motos = worksheet1.getRow(7);
+                    Cell moto = motos.getCell(12);
+                    vol.setVolMotos((int)moto.getNumericCellValue());
+                    System.out.println("Volumen motos: " + vol.getVolMotos());
+                    
+                    Row total = worksheet1.getRow(7);
+                    Cell tot = total.getCell(17);
+                    vol.setVolTotal((int)tot.getNumericCellValue());
+                    System.out.println("Volumen total: " + vol.getVolTotal());
+                }
+            }
+        }catch(Exception e){
+            System.out.println("Se ha generado un problema leyendo los archivos -> " + e );
+            e.printStackTrace();
+        }
+        System.out.println("Done!");
+        return volumenesDTO;
     }
     
     static String hacerRuta (String tipoDato, String mes, String anio){
