@@ -1,9 +1,13 @@
 
 package Modelo;
 
+import com.esri.core.geometry.CoordinateConversion;
+import com.esri.core.geometry.Point;
+import com.esri.map.JMap;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -28,12 +32,12 @@ public class Modelo{
     static final String WIN_APPENDER = "\\";
     
     
-    public static void cargarDatos(String tipoDato, String mes, String anio){
+    public static void cargarDatos(String tipoDato, String mes, String anio, JMap map){
         if(!"".equals(tipoDato) && !"Mes".equals(mes) && !"Año".equals(anio)){
             if("Velocidad".equals(tipoDato)){
-                List<VelocidadDTO> velocidades = leerVelocidades(tipoDato,mes,anio);
+                List<VelocidadDTO> velocidades = leerVelocidades(tipoDato,mes,anio, map);
             }if("Volumen".equals(tipoDato)){
-                List<VolumenDTO> volumenes = leerVolumenes(tipoDato,mes,anio);
+                List<VolumenDTO> volumenes = leerVolumenes(tipoDato,mes,anio, map);
             }
             System.out.println(tipoDato + " " + mes + " " + anio);
         }else
@@ -156,7 +160,7 @@ public class Modelo{
         infoApp.add(content);
     }
     
-    static List<VelocidadDTO> leerVelocidades(String tipoDato, String mes, String anio){
+    static List<VelocidadDTO> leerVelocidades(String tipoDato, String mes, String anio, JMap map){
         List<VelocidadDTO> velocidadesDTO = new ArrayList<>();
         try{
             System.out.println("leerVelocidades");
@@ -389,7 +393,7 @@ public class Modelo{
         return velocidadesDTO;
     }
     
-    static List<VolumenDTO> leerVolumenes(String tipoDato, String mes, String anio){
+    static List<VolumenDTO> leerVolumenes(String tipoDato, String mes, String anio, JMap map){
         List<VolumenDTO> volumenesDTO = new ArrayList<>();
         try{
             System.out.println("leerVolumenes");
@@ -424,7 +428,7 @@ public class Modelo{
                     System.out.println("Nombre del Archivo:" + vol.getNombreArchivo());
                     
                     //Lectura interseccion
-                    Row interseccion = worksheet.getRow(9);
+                    Row interseccion = worksheet.getRow(11);
                     Cell inter = interseccion.getCell(21);
                     vol.setInterseccion(inter.getStringCellValue());
                     System.out.println("Intersección: " + vol.getInterseccion());
@@ -501,6 +505,82 @@ public class Modelo{
                     Cell tot = total.getCell(17);
                     vol.setVolTotal((int)tot.getNumericCellValue());
                     System.out.println("Volumen total: " + vol.getVolTotal());
+                    
+                    //Lectura resumen cartilla
+                    XSSFSheet worksheet2 = workbook.getSheet("5. RESUMEN CARTILLA");
+                    
+                    //Lectura lista periodo 1
+                    List<String> periodo1 = new ArrayList<>();
+                    Row peri1 = worksheet2.getRow(9);
+                    int cont = 0;
+                    for( int i = 6; i < 14 ; i++){
+                        Cell per1 = peri1.getCell(i);
+                        if(cont == 0){
+                            periodo1.add(per1.getStringCellValue());
+                        }else if(cont == 1){
+                            periodo1.add(String.valueOf((int)per1.getNumericCellValue()));
+                        }else{
+                            periodo1.add(String.valueOf(per1.getNumericCellValue()));
+                        }
+                        cont++;
+                    }
+                    vol.setPeriodo1(periodo1);
+                    
+                    for(int i = 0; i<vol.getPeriodo1().size(); i++){
+                        System.out.println("Periodo1: " + vol.getPeriodo1().get(i));
+                    }
+                    
+                    //Lectura lista periodo 2
+                    List<String> periodo2 = new ArrayList<>();
+//                    Row peri2 = worksheet2.getRow(9);
+                    cont = 0;
+                    for( int i = 15; i < 23 ; i++){
+                        Cell per2 = peri1.getCell(i);
+                        if(cont == 0){
+                            periodo2.add(per2.getStringCellValue());
+                        }else if(cont == 1){
+                            periodo2.add(String.valueOf((int)per2.getNumericCellValue()));
+                        }else{
+                            periodo2.add(String.valueOf(per2.getNumericCellValue()));
+                        }
+                        cont++;
+                    }
+                    vol.setPeriodo2(periodo2);
+                    
+                    for(int i = 0; i<vol.getPeriodo2().size(); i++){
+                        System.out.println("Periodo2: " + vol.getPeriodo2().get(i));
+                    }
+                    
+                    //Lectura lista periodo 3
+                    List<String> periodo3 = new ArrayList<>();
+//                    Row peri3 = worksheet2.getRow(9);
+                    cont = 0;
+                    for( int i = 24; i < 32 ; i++){
+                        Cell per3 = peri1.getCell(i);
+                        if(cont == 0){
+                            periodo3.add(per3.getStringCellValue());
+                        }else if(cont == 1){
+                            periodo3.add(String.valueOf((int)per3.getNumericCellValue()));
+                        }else{
+                            periodo3.add(String.valueOf(per3.getNumericCellValue()));
+                        }
+                        cont++;
+                    }
+                    vol.setPeriodo3(periodo3);
+                    
+                    for(int i = 0; i<vol.getPeriodo3().size(); i++){
+                        System.out.println("Periodo3: " + vol.getPeriodo3().get(i));
+                    }
+                    
+                    //Convierte las coordenadas leidas en coordenadas de grados decimales dentro de un solo string (latitud + longitud)
+                    String coords = hacerCoordenadas(vol.getLon(), vol.getLat(), map);
+                    
+                    //Conseguimos una lista de las dos coordenadas en tipo double
+                    //Primera: latitud
+                    //Segunda: longitud
+                    List<Double> coordenadas = getCoords(coords);
+                    
+                    map.addMarkerGraphic(coordenadas.get(0),coordenadas.get(1), vol.getInterseccion(),vol.getAnalisisPuntual());
                 }
             }
         }catch(Exception e){
@@ -515,6 +595,54 @@ public class Modelo{
         String ruta = PREFIJO_RUTA + WIN_APPENDER + tipoDato + WIN_APPENDER + 
                 anio + WIN_APPENDER + mes;
         return ruta;
+    }
+    
+    static String hacerCoordenadas(String lon, String lat, JMap map){
+        
+        //Formato de String coordenada para convertir en point:
+        //<degrees> [<degree-mark>] <separator> <minutes> [<minute-mark>] <separator> <seconds> [<decimal>] <fraction of second> [<second-mark>]
+        
+        String pointLat = lat.replace(",", ".");
+        String pointLon = lon.replace(",", ".");
+        
+        String newPoint = pointLat + " " + pointLon;
+        
+        //Crear point de coordenandas
+        Point newCoor = CoordinateConversion.degreesMinutesSecondsToPoint(newPoint, map.getSpatialReference());
+        System.out.println("Coordenada final " + CoordinateConversion.pointToDegreesMinutesSeconds(newCoor, map.getSpatialReference(), 2));
+        System.out.println("Decimal Degrees: " + CoordinateConversion.pointToDecimalDegrees(newCoor, map.getSpatialReference(), 4));
+        
+        String coords = CoordinateConversion.pointToDecimalDegrees(newCoor, map.getSpatialReference(), 4);
+        System.out.println("Coords: " + coords);
+        return coords;
+    }
+    
+    static List<Double> getCoords(String coordenadas){
+        List<Double> listCoordenadas = new ArrayList<>();
+        String[] partes = coordenadas.split(" ");
+        
+        double latitud;
+        double longitud;
+        
+        if(partes[0].endsWith("S")){
+            latitud = (Double.valueOf(partes[0].replace("S", ""))) * (-1);
+            listCoordenadas.add(latitud);
+            System.out.println("Latitud final: " + latitud);
+        }else if(partes[0].endsWith("N")){
+            latitud = (Double.valueOf(partes[0].replace("N", "")));
+            listCoordenadas.add(latitud);
+            System.out.println("Latitud final: " + latitud);
+        }if(partes[1].endsWith("W")){
+            longitud = (Double.valueOf(partes[1].replace("W", "")) * (-1));
+            listCoordenadas.add(longitud);
+            System.out.println("Longitud final: " + longitud);
+        }else if(partes[1].endsWith("E")){
+            longitud = (Double.valueOf(partes[1].replace("E", "")));
+            listCoordenadas.add(longitud);
+            System.out.println("Longitud final: " + longitud);
+        }
+        
+        return listCoordenadas;
     }
     
 }

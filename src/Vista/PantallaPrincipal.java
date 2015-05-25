@@ -124,7 +124,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     // application content
     JPanel contentPane = new JPanel(new BorderLayout());
 
-    // map options: topographic map, centered at lat-lon 41.9, 12.5 (Rome), zoom level 12
+    // map options: street map, centered at lat-lon 4.65, -74.08 (Bogotá), zoom level 11
     MapOptions mapOptions = new MapOptions(MapOptions.MapType.STREETS, 4.65000, -74.080, 11);
     
     // create the map using MapOptions
@@ -171,7 +171,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             String mes = String.valueOf(comboBoxMeses.getSelectedItem());
             String anio = String.valueOf(comboBoxAnios.getSelectedItem());
             
-            Controlador.cargarDatos(tipoDato, mes, anio);
+            Controlador.cargarDatos(tipoDato, mes, anio, map);
         }
     });
     

@@ -2,6 +2,7 @@
 package Controlador;
 
 import Modelo.Modelo;
+import com.esri.map.JMap;
 
 /**
  *
@@ -9,8 +10,8 @@ import Modelo.Modelo;
  */
 public class Controlador {
     
-    public static void cargarDatos(String tipoDato, String mes, String anio){
-        Modelo.cargarDatos(tipoDato, mes, anio);
+    public static void cargarDatos(String tipoDato, String mes, String anio, JMap map){
+        Modelo.cargarDatos(tipoDato, mes, anio, map);
     }
     
     public static void limpiarMapa(){
