@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class VelocidadDTO {
     
-    private double lat;
-    private double lon;
+    private List<String> lat;
+    private List<String> lon;
     private String nombreArchivo;
     private String nombreCorredor;
     private String fechaEstudio;
@@ -46,7 +46,7 @@ public class VelocidadDTO {
     public VelocidadDTO() {
     }
 
-    public VelocidadDTO(double lat, double lon, String nombreArchivo, String nombreCorredor, String fechaEstudio, String analisisPuntual, List<List<String>> descripcionTramos, List<String> tipoVehiculo, List<List<String>> horarioDePeriodos, List<List<String>> numEquipos, double velTP_AM_NS_WE, double velTP_M_NS_WE, double velTP_PM_NS_WE, double velTPC_AM_NS_WE, double velTPC_M_NS_WE, double velTPC_PM_NS_WE, double velTPI_AM_NS_WE, double velTPI_M_NS_WE, double velTPI_PM_NS_WE, double velTP_AM_SN_EW, double velTP_M_SN_EW, double velTP_PM_SN_EW, double velTPC_AM_SN_EW, double velTPC_M_SN_EW, double velTPC_PM_SN_EW, double velTPI_AM_SN_EW, double velTPI_M_SN_EW, double velTPI_PM_SN_EW, List<List<String>> velocidadesPromedio) {
+    public VelocidadDTO(List<String> lat, List<String> lon, String nombreArchivo, String nombreCorredor, String fechaEstudio, String analisisPuntual, List<List<String>> descripcionTramos, List<String> tipoVehiculo, List<List<String>> horarioDePeriodos, List<List<String>> numEquipos, double velTP_AM_NS_WE, double velTP_M_NS_WE, double velTP_PM_NS_WE, double velTPC_AM_NS_WE, double velTPC_M_NS_WE, double velTPC_PM_NS_WE, double velTPI_AM_NS_WE, double velTPI_M_NS_WE, double velTPI_PM_NS_WE, double velTP_AM_SN_EW, double velTP_M_SN_EW, double velTP_PM_SN_EW, double velTPC_AM_SN_EW, double velTPC_M_SN_EW, double velTPC_PM_SN_EW, double velTPI_AM_SN_EW, double velTPI_M_SN_EW, double velTPI_PM_SN_EW, List<List<String>> velocidadesPromedio) {
         this.lat = lat;
         this.lon = lon;
         this.nombreArchivo = nombreArchivo;
@@ -78,19 +78,19 @@ public class VelocidadDTO {
         this.velocidadesPromedio = velocidadesPromedio;
     }
 
-    public double getLat() {
+    public List<String> getLat() {
         return lat;
     }
 
-    public void setLat(double lat) {
+    public void setLat(List<String> lat) {
         this.lat = lat;
     }
 
-    public double getLon() {
+    public List<String> getLon() {
         return lon;
     }
 
-    public void setLon(double lon) {
+    public void setLon(List<String> lon) {
         this.lon = lon;
     }
 

@@ -3,11 +3,18 @@ package Modelo;
 
 import com.esri.core.geometry.CoordinateConversion;
 import com.esri.core.geometry.Point;
+import com.esri.core.map.Graphic;
+import com.esri.core.symbol.SimpleLineSymbol;
+import com.esri.map.GraphicsLayer;
 import com.esri.map.JMap;
+import com.esri.toolkit.overlays.DrawingCompleteEvent;
+import com.esri.toolkit.overlays.DrawingCompleteListener;
+import com.esri.toolkit.overlays.DrawingOverlay;
+import com.esri.toolkit.overlays.DrawingOverlay.DrawingMode;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -30,6 +37,7 @@ public class Modelo{
     
     static final String PREFIJO_RUTA = "src\\zData";
     static final String WIN_APPENDER = "\\";
+    static private GraphicsLayer graphicsLayer;
     
     
     public static void cargarDatos(String tipoDato, String mes, String anio, JMap map){
@@ -45,11 +53,11 @@ public class Modelo{
     }
     
     public static void limpiarMapa(){
-        System.out.println("Limpiar mapa a implementar");
+//        System.out.println("Limpiar mapa a implementar");
     }
     
     public static void cargarMasInfo(){
-        System.out.println("Mostrar mas info");
+//        System.out.println("Mostrar mas info");
         
         //Creamos la nueva ventana
         JFrame masInfo = new JFrame();
@@ -177,29 +185,57 @@ public class Modelo{
                     XSSFWorkbook workbook = new XSSFWorkbook(stream);
                     XSSFSheet worksheet = workbook.getSheet("1.IDENTIFICACION");
 
+                    //Lectura coordenadas
+                    List<String> lats = new ArrayList<>();
+                    List<String> lons = new ArrayList<>();
+                    for(int i = 33; i < 55; i++){
+                        Row row = worksheet.getRow(i);
+                        Cell cell = row.getCell(21);
+                        if(!cell.getStringCellValue().isEmpty() || !cell.getStringCellValue().equals("")){
+                            lats.add(cell.getStringCellValue().trim());
+                        }
+                    }
+                    vel.setLat(lats);
+                    
+                    for(int i = 33; i < 55; i++){
+                        Row row = worksheet.getRow(i);
+                        Cell cell = row.getCell(22);
+                        if(!cell.getStringCellValue().isEmpty() || !cell.getStringCellValue().equals("")){
+                            lons.add(cell.getStringCellValue().trim());
+                        }
+                    }
+                    vel.setLon(lons);
+                    
+//                    for(int i = 0; i < vel.getLat().size(); i++){
+//                        System.out.println("Latitud: " + vel.getLat().get(i));
+//                    }
+//                    for(int i = 0; i < vel.getLon().size(); i++){
+//                        System.out.println("Longitud: " + vel.getLon().get(i));
+//                    }
+
                     //Lectura nombreArchivo
                     Row row1 = worksheet.getRow(9);
                     Cell cell1 = row1.getCell(21);
                     vel.setNombreArchivo(cell1.getStringCellValue());
-                    System.out.println("Nombre del archivo: " + vel.getNombreArchivo());
+//                    System.out.println("Nombre del archivo: " + vel.getNombreArchivo());
                     
                     //Lectura nombreCorredor
                     Row row2 = worksheet.getRow(11);
                     Cell cell2 = row2.getCell(21);
                     vel.setNombreCorredor(cell2.getStringCellValue());
-                    System.out.println("Corredor vial: " + vel.getNombreCorredor());
+//                    System.out.println("Corredor vial: " + vel.getNombreCorredor());
                     
                     //Lectura fechaEstudio
                     Row row3 = worksheet.getRow(25);
                     Cell cell3 = row3.getCell(17);
                     vel.setFechaEstudio(cell3.getStringCellValue());
-                    System.out.println("Fecha del estudio: " + vel.getFechaEstudio());
+//                    System.out.println("Fecha del estudio: " + vel.getFechaEstudio());
                     
                     //Lectura analisisPuntual
                     Row row4 = worksheet.getRow(57);
                     Cell cell4 = row4.getCell(16);
                     vel.setAnalisisPuntual(cell4.getStringCellValue());
-                    System.out.println("El análisis: " + vel.getAnalisisPuntual());
+//                    System.out.println("El análisis: " + vel.getAnalisisPuntual());
                     
                     //Lectura descripcionTramos
                     List<List<String>> tramos = new ArrayList<>();
@@ -222,11 +258,11 @@ public class Modelo{
                     }
                     vel.setDescripcionTramos(tramos);
                     
-                    for(int i = 0; i<vel.getDescripcionTramos().size(); i++){
-                        for(int j = 0; j<vel.getDescripcionTramos().get(i).size(); j++){
-                            System.out.println("Tramos: " + vel.getDescripcionTramos().get(i).get(j));
-                        }
-                    }
+//                    for(int i = 0; i<vel.getDescripcionTramos().size(); i++){
+//                        for(int j = 0; j<vel.getDescripcionTramos().get(i).size(); j++){
+//                            System.out.println("Tramos: " + vel.getDescripcionTramos().get(i).get(j));
+//                        }
+//                    }
                     
                     //Lectura tipoVehiculos
                     List<String> tipoVehiculos = new ArrayList<>();
@@ -240,9 +276,9 @@ public class Modelo{
                     }
                     vel.setTipoVehiculo(tipoVehiculos);
                     
-                    for(int i = 0; i<vel.getTipoVehiculo().size(); i++){
-                        System.out.println("Tipo vehiculo: " + vel.getTipoVehiculo().get(i));
-                    }
+//                    for(int i = 0; i<vel.getTipoVehiculo().size(); i++){
+//                        System.out.println("Tipo vehiculo: " + vel.getTipoVehiculo().get(i));
+//                    }
                     
                     //Lectura horarios de periodos
                     List<List<String>> horarios = new ArrayList<>();
@@ -258,11 +294,11 @@ public class Modelo{
                     }
                     vel.setHorarioDePeriodos(horarios);
                     
-                    for(int i = 0; i<vel.getHorarioDePeriodos().size(); i++){
-                        for(int j = 0; j<vel.getHorarioDePeriodos().get(i).size(); j++){
-                            System.out.println("Horarios: " + vel.getHorarioDePeriodos().get(i).get(j));
-                        }
-                    }
+//                    for(int i = 0; i<vel.getHorarioDePeriodos().size(); i++){
+//                        for(int j = 0; j<vel.getHorarioDePeriodos().get(i).size(); j++){
+//                            System.out.println("Horarios: " + vel.getHorarioDePeriodos().get(i).get(j));
+//                        }
+//                    }
                     
                     //Lectura numEquipos
                     List<List<String>> equipos = new ArrayList<>();
@@ -286,11 +322,11 @@ public class Modelo{
                     }
                     vel.setNumEquipos(equipos);
                     
-                    for(int i = 0; i<vel.getNumEquipos().size(); i++){
-                        for(int j = 0; j<vel.getNumEquipos().get(i).size(); j++){
-                            System.out.println("Equipos: " + vel.getNumEquipos().get(i).get(j));
-                        }
-                    }
+//                    for(int i = 0; i<vel.getNumEquipos().size(); i++){
+//                        for(int j = 0; j<vel.getNumEquipos().get(i).size(); j++){
+//                            System.out.println("Equipos: " + vel.getNumEquipos().get(i).get(j));
+//                        }
+//                    }
                     
                     //Lectura de velocidades
                     XSSFSheet worksheet1 = workbook.getSheet("4c.PERFIL DE VELOCIDAD");
@@ -317,11 +353,11 @@ public class Modelo{
                     }
                     vel.setVelocidadesPromedio(velocidades);
                     
-                    for(int i = 0; i<vel.getVelocidadesPromedio().size(); i++){
-                        for(int j = 0; j<vel.getVelocidadesPromedio().get(i).size(); j++){
-                            System.out.println("Velocidades: " + vel.getVelocidadesPromedio().get(i).get(j));
-                        }
-                    }
+//                    for(int i = 0; i<vel.getVelocidadesPromedio().size(); i++){
+//                        for(int j = 0; j<vel.getVelocidadesPromedio().get(i).size(); j++){
+//                            System.out.println("Velocidades: " + vel.getVelocidadesPromedio().get(i).get(j));
+//                        }
+//                    }
                     
                     //Lectura de datos definitivos
                     XSSFSheet worksheet2 = workbook.getSheet("5b.RESUMEN MENSUAL");
@@ -380,9 +416,51 @@ public class Modelo{
                     
                     Cell ce18 = res1.getCell(28);
                     vel.setVelTPI_PM_SN_EW(ce18.getNumericCellValue());
-                    System.out.println("velTPI: " + vel.getVelTPI_PM_SN_EW());
+//                    System.out.println("velTPI: " + vel.getVelTPI_PM_SN_EW());
                     
                     velocidadesDTO.add(vel);
+                    
+                    //Convierte las coordenadas leidas en coordenadas de grados decimales dentro de una lista con un solo string (latitud + longitud)
+                    List<String> coordsList = new ArrayList<>();
+                    for(int i = 0; i < vel.getLat().size(); i++){
+                        String coords = hacerCoordenadas(vel.getLon().get(i), vel.getLat().get(i), map);
+                        coordsList.add(coords);
+                    }
+                    
+                    //Conseguimos una lista de las dos coordenadas en tipo double
+                    //Primera: latitud
+                    //Segunda: longitud
+                    List<List<Double>> listaCoords = new ArrayList<>();
+                    for(int i = 0; i < coordsList.size(); i++){
+                        List<Double> coordenadas = getCoords(coordsList.get(i));
+                        listaCoords.add(coordenadas);
+                    }
+                    
+//                    final DrawingOverlay drawingOverlay = new DrawingOverlay();
+//                    map.addMapOverlay(drawingOverlay);
+//                    drawingOverlay.setActive(true);
+//                    graphicsLayer = new GraphicsLayer();
+//                    map.getLayers().add(graphicsLayer);
+//                        
+                    for(int i = 0 ; i < listaCoords.size(); i++){
+//                        
+//                        drawingOverlay.addDrawingCompleteListener(new DrawingCompleteListener() {
+//                            @Override
+//                            public void drawingCompleted(DrawingCompleteEvent event) {
+//                                graphicsLayer.addGraphic((Graphic)drawingOverlay.getAndClearGraphic());
+//                            }
+//                        });
+//                        drawingOverlay.setUp(DrawingMode.POLYLINE_FREEHAND, 
+//                            new SimpleLineSymbol(Color.RED, 3), null);
+                        map.addMarkerGraphic(listaCoords.get(i).get(0),listaCoords.get(i).get(1), "\nCORREDOR: " + vel.getNombreCorredor(),
+                                "\nNOMBRE DEL ARCHIVO: " + vel.getNombreArchivo() +  
+                                "\nCORREDOR ANALIZADO: " + vel.getNombreCorredor() +  
+                                "\nFECHA DEL ESTUDIO: " + vel.getFechaEstudio() +
+                                "\nANALISIS PUNTUAL: " + vel.getAnalisisPuntual());
+                        
+//                        map.addMarkerGraphic(listaCoords.get(i).get(0),listaCoords.get(i).get(1),"CORREDOR: " + vel.getNombreCorredor(), "ANÁLISIS PUNTUAL: " + vel.getAnalisisPuntual());
+                    }
+                    
                 }
             }
         }catch(Exception e){
@@ -414,36 +492,36 @@ public class Modelo{
                     Row longitud = worksheet.getRow(12);
                     Cell longitu = longitud.getCell(23);
                     vol.setLon(longitu.getStringCellValue());
-                    System.out.println("Longitud: " + vol.getLon());
+//                    System.out.println("Longitud: " + vol.getLon());
                     
                     Row latitud = worksheet.getRow(13);
                     Cell latitu = latitud.getCell(23);
                     vol.setLat(latitu.getStringCellValue());
-                    System.out.println("Latitud: " + vol.getLat());
+//                    System.out.println("Latitud: " + vol.getLat());
                     
                     //Lectura nombreArchivo
                     Row nombre = worksheet.getRow(9);
                     Cell nom = nombre.getCell(21);
                     vol.setNombreArchivo(nom.getStringCellValue());
-                    System.out.println("Nombre del Archivo:" + vol.getNombreArchivo());
+//                    System.out.println("Nombre del Archivo:" + vol.getNombreArchivo());
                     
                     //Lectura interseccion
                     Row interseccion = worksheet.getRow(11);
                     Cell inter = interseccion.getCell(21);
                     vol.setInterseccion(inter.getStringCellValue());
-                    System.out.println("Intersección: " + vol.getInterseccion());
+//                    System.out.println("Intersección: " + vol.getInterseccion());
                     
                     //Lectura fechaEstudio
                     Row fecha = worksheet.getRow(27);
                     Cell fec = fecha.getCell(18);
                     vol.setFechaEstudio(fec.getStringCellValue());
-                    System.out.println("Fecha: " + vol.getFechaEstudio());
+//                    System.out.println("Fecha: " + vol.getFechaEstudio());
                     
                     //Lectura analisisPuntual
                     Row analisis = worksheet.getRow(58);
                     Cell ana = analisis.getCell(16);
                     vol.setAnalisisPuntual(ana.getStringCellValue());
-                    System.out.println("Analisis: " + vol.getAnalisisPuntual());
+//                    System.out.println("Analisis: " + vol.getAnalisisPuntual());
                     
                     //Lectura numPeriodos
                     List<String> numPeriodos = new ArrayList<>();
@@ -456,27 +534,27 @@ public class Modelo{
                     }
                     vol.setNumPeriodos(numPeriodos);
                     
-                    for(int i = 0; i<vol.getNumPeriodos().size(); i++){
-                        System.out.println("Periodo " + i + ": " + vol.getNumPeriodos().get(i));
-                    }
+//                    for(int i = 0; i<vol.getNumPeriodos().size(); i++){
+//                        System.out.println("Periodo " + i + ": " + vol.getNumPeriodos().get(i));
+//                    }
                     
                     //Lectura numHoras
                     Row horas = worksheet.getRow(37);
                     Cell hor = horas.getCell(24);
                     vol.setNumHoras(String.valueOf(hor.getNumericCellValue()));
-                    System.out.println("Número de horas: " + vol.getNumHoras());
+//                    System.out.println("Número de horas: " + vol.getNumHoras());
                     
                     //Lectura horario
                     Row horario = worksheet.getRow(38);
                     Cell hora = horario.getCell(24);
                     vol.setHorario(hora.getStringCellValue());
-                    System.out.println("Horario: " + vol.getHorario());
+//                    System.out.println("Horario: " + vol.getHorario());
                     
                     //Lectura numEquipos
                     Row equipos = worksheet.getRow(39);
                     Cell equi = equipos.getCell(24);
                     vol.setNumEquipos(String.valueOf(equi.getNumericCellValue()));
-                    System.out.println("Numero de equipos: " + vol.getNumEquipos());
+//                    System.out.println("Numero de equipos: " + vol.getNumEquipos());
                     
                     //Lectura resumen mensual
                     XSSFSheet worksheet1 = workbook.getSheet("5a.RESUMEN MENSUAL");
@@ -484,27 +562,27 @@ public class Modelo{
                     Row livianos = worksheet1.getRow(7);
                     Cell livi = livianos.getCell(9);
                     vol.setVolLivianos((int)livi.getNumericCellValue());
-                    System.out.println("Volumen vehículos livianos: " + vol.getVolLivianos());
+//                    System.out.println("Volumen vehículos livianos: " + vol.getVolLivianos());
                     
                     Row vtpc = worksheet1.getRow(7);
                     Cell tpc = vtpc.getCell(10);
                     vol.setVolTPC((int)tpc.getNumericCellValue());
-                    System.out.println("Volumen Transporte público colectivo: " + vol.getVolTPC());
+//                    System.out.println("Volumen Transporte público colectivo: " + vol.getVolTPC());
                     
                     Row camiones = worksheet1.getRow(7);
                     Cell camion = camiones.getCell(11);
                     vol.setVolCamiones((int)camion.getNumericCellValue());
-                    System.out.println("Volumen camiones: " + vol.getVolCamiones());
+//                    System.out.println("Volumen camiones: " + vol.getVolCamiones());
                     
                     Row motos = worksheet1.getRow(7);
                     Cell moto = motos.getCell(12);
                     vol.setVolMotos((int)moto.getNumericCellValue());
-                    System.out.println("Volumen motos: " + vol.getVolMotos());
+//                    System.out.println("Volumen motos: " + vol.getVolMotos());
                     
                     Row total = worksheet1.getRow(7);
                     Cell tot = total.getCell(17);
                     vol.setVolTotal((int)tot.getNumericCellValue());
-                    System.out.println("Volumen total: " + vol.getVolTotal());
+//                    System.out.println("Volumen total: " + vol.getVolTotal());
                     
                     //Lectura resumen cartilla
                     XSSFSheet worksheet2 = workbook.getSheet("5. RESUMEN CARTILLA");
@@ -526,9 +604,9 @@ public class Modelo{
                     }
                     vol.setPeriodo1(periodo1);
                     
-                    for(int i = 0; i<vol.getPeriodo1().size(); i++){
-                        System.out.println("Periodo1: " + vol.getPeriodo1().get(i));
-                    }
+//                    for(int i = 0; i<vol.getPeriodo1().size(); i++){
+//                        System.out.println("Periodo1: " + vol.getPeriodo1().get(i));
+//                    }
                     
                     //Lectura lista periodo 2
                     List<String> periodo2 = new ArrayList<>();
@@ -547,9 +625,9 @@ public class Modelo{
                     }
                     vol.setPeriodo2(periodo2);
                     
-                    for(int i = 0; i<vol.getPeriodo2().size(); i++){
-                        System.out.println("Periodo2: " + vol.getPeriodo2().get(i));
-                    }
+//                    for(int i = 0; i<vol.getPeriodo2().size(); i++){
+//                        System.out.println("Periodo2: " + vol.getPeriodo2().get(i));
+//                    }
                     
                     //Lectura lista periodo 3
                     List<String> periodo3 = new ArrayList<>();
@@ -568,9 +646,11 @@ public class Modelo{
                     }
                     vol.setPeriodo3(periodo3);
                     
-                    for(int i = 0; i<vol.getPeriodo3().size(); i++){
-                        System.out.println("Periodo3: " + vol.getPeriodo3().get(i));
-                    }
+//                    for(int i = 0; i<vol.getPeriodo3().size(); i++){
+//                        System.out.println("Periodo3: " + vol.getPeriodo3().get(i));
+//                    }
+                    
+                    volumenesDTO.add(vol);
                     
                     //Convierte las coordenadas leidas en coordenadas de grados decimales dentro de un solo string (latitud + longitud)
                     String coords = hacerCoordenadas(vol.getLon(), vol.getLat(), map);
@@ -580,7 +660,12 @@ public class Modelo{
                     //Segunda: longitud
                     List<Double> coordenadas = getCoords(coords);
                     
-                    map.addMarkerGraphic(coordenadas.get(0),coordenadas.get(1), vol.getInterseccion(),vol.getAnalisisPuntual());
+                    map.addMarkerGraphic(coordenadas.get(0),coordenadas.get(1), "INTERSECCIÓN: " + vol.getInterseccion(),
+                            "NOMBRE DEL ARCHIVO" + vol.getNombreArchivo() + 
+                            "FECHA ESTUDIO: " + vol.getFechaEstudio() +
+                            "HORARIO" + vol.getHorario() +
+                            "NÚMERO DE EQUIPOS" + vol.getNumEquipos() +
+                            vol.getAnalisisPuntual());
                 }
             }
         }catch(Exception e){
@@ -597,6 +682,7 @@ public class Modelo{
         return ruta;
     }
     
+           //Genera las coordenadas en el formato de ArcGIS
     static String hacerCoordenadas(String lon, String lat, JMap map){
         
         //Formato de String coordenada para convertir en point:
@@ -617,6 +703,8 @@ public class Modelo{
         return coords;
     }
     
+           //Retorna una lista de doubles con la coordenada X en la posicion 0 
+           //y la coordenada Y en la posicion 1
     static List<Double> getCoords(String coordenadas){
         List<Double> listCoordenadas = new ArrayList<>();
         String[] partes = coordenadas.split(" ");

@@ -97,7 +97,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     window.setSize(1366, 768);
     window.setLocationRelativeTo(null);
     window.setResizable(false);
-    ImageIcon img = new ImageIcon("src\\img\\Javeriana.png");
+    ImageIcon img = new ImageIcon("src\\img\\FoxWay.png");
     window.setIconImage(img.getImage());
     window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     window.getContentPane().setLayout(new BorderLayout());
@@ -124,10 +124,10 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     // application content
     JPanel contentPane = new JPanel(new BorderLayout());
 
-    // map options: street map, centered at lat-lon 4.65, -74.08 (Bogotá), zoom level 11
+    // map options: tipo de mapa street map, centrado en lat-lon 4.65, -74.08 (Bogotá), zoom level 11
     MapOptions mapOptions = new MapOptions(MapOptions.MapType.STREETS, 4.65000, -74.080, 11);
     
-    // create the map using MapOptions
+    // crea el mapa usando MapOptions
     map = new JMap(mapOptions);
     
     //adding menu panel
@@ -269,19 +269,19 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     layoutApp.setAutoCreateGaps(true);
     layoutApp.setAutoCreateContainerGaps(true);
     logos.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.BLACK),new EmptyBorder(1,1,1,1)));
-    BufferedImage fx = ImageIO.read(new File("src\\img\\fx.png"));
+    BufferedImage fx = ImageIO.read(new File("src\\img\\FoxWay.png"));
     JLabel logoFx = new JLabel(new ImageIcon(fx));
     BufferedImage jv = ImageIO.read(new File("src\\img\\Javeriana.png"));
     JLabel logoPUJ = new JLabel(new ImageIcon(jv));
     layoutApp.setHorizontalGroup(layoutApp.createSequentialGroup()
-            .addComponent(logoFx)
-            .addGap(27)
             .addComponent(logoPUJ)
+            .addGap(27)
+            .addComponent(logoFx)
     );
     layoutApp.setVerticalGroup(layoutApp.createSequentialGroup()
             .addGroup(layoutApp.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(logoFx)
                     .addComponent(logoPUJ)
+                    .addComponent(logoFx)
             )
             
     );
